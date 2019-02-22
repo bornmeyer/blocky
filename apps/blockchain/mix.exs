@@ -11,9 +11,15 @@ defmodule Blockchain.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env)
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/helpers.exs"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
