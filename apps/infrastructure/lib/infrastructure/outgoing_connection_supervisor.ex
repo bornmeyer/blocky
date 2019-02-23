@@ -11,6 +11,7 @@ defmodule Infrastructure.OutgoingConnectionSupervisor do
   def init(_) do
     ip = Application.get_env(:infrastructure, :outgoing_ip)
     port = Application.get_env(:infrastructure, :outgoing_port)
+    Logger.info fn -> "#{ip |> inspect}:#{port} for outgoing" end
     children =  [
       Infrastructure.ConnectionHandler.child_spec([ip, port])
     ]
@@ -20,6 +21,7 @@ defmodule Infrastructure.OutgoingConnectionSupervisor do
   ## api
 
   def get_outgoing_connection() do
+    Logger.info "test"
     Supervisor.which_children(__MODULE__) |> Enum.map(fn current ->
       {_, pid, _, _} = current
       pid

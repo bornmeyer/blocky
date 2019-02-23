@@ -1,5 +1,6 @@
 defmodule Infrastructure.ConnectionSupervisor do
   use DynamicSupervisor
+  require Logger
 
   ## callbacks
 
@@ -14,7 +15,8 @@ defmodule Infrastructure.ConnectionSupervisor do
   ## api
 
   def create_connection(ip, port) do
-    child_spec = Infrastructure.ConnectionHandler.child_spec([ip, port, []])
+    Logger.info fn -> "creating handler for #{ip |> inspect}:#{port}" end
+    child_spec = Infrastructure.ConnectionHandler.child_spec([ip, port])
     pid = case DynamicSupervisor.start_child(__MODULE__, child_spec) do
       {:ok, pid} -> pid
       {:error, {:already_started, pid}} -> pid

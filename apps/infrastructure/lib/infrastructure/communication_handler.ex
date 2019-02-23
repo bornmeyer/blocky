@@ -3,6 +3,7 @@ defmodule Infrastructure.CommunicationHandler do
   alias Infrastructure.ConnectionInfo
   alias Infrastructure.Helpers
   alias Infrastructure.MessageProcessor
+  alias Infrastructure.MessageSender
   @behaviour :ranch_protocol
   require Logger
 
@@ -21,8 +22,8 @@ defmodule Infrastructure.CommunicationHandler do
   def handle_info({:tcp, socket, data}, state = %{socket: socket, transport: transport}) do
     response = Helpers.unpack(data)
     |> MessageProcessor.handle_message(socket, transport)
-    |> Helpers.pack()
-    transport.send(socket, response)
+    |> MessageSender.send()
+    #transport.send(socket, response)
     {:noreply, state}
   end
 
@@ -30,9 +31,5 @@ defmodule Infrastructure.CommunicationHandler do
     IO.puts "Closing"
     transport.close(socket)
     {:stop, :normal, state}
-  end
-
-  def handle_info(test, state) do
-    IO.inspect test
   end
 end

@@ -2,9 +2,9 @@ defmodule Infrastructure.MessageProcessor do
   alias Infrastructure.ConnectionInfo
   alias Infrastructure.Helpers
 
-  defp create_connection_info(socket) do
+  defp create_connection_info(socket, listening_port) do
     with {:ok, {ip, port}} <- :inet.peername(socket),
-      {:ok, handler} <- Infrastructure.ConnectionSupervisor.create_connection(ip, port) do
+      {:ok, handler} <- Infrastructure.ConnectionSupervisor.create_connection(ip, listening_port) do
         %ConnectionInfo{ip: ip, port: port, sender: handler}
     end
   end
@@ -17,12 +17,11 @@ defmodule Infrastructure.MessageProcessor do
     address
   end
 
-  def handle_message({:connect}, socket, _transport) do
-    ip_with_port = create_connection_info(socket)
-
-
-    register_remote_address(ip_with_port)
-    |> Infrastructure.KnownNodesContainer.get_for()
+  def handle_message({:connect, listening_port}, socket, _transport) do
+    connection_info = create_connection_info(socket, listening_port)
+    list = register_remote_address(connection_info)
+      |> Infrastructure.KnownNodesContainer.get_for()
+    {:connected, list, connection_info}
   end
 
   def handle_message({:connected, nodes_to_connect_to}, _socket, _transport) do

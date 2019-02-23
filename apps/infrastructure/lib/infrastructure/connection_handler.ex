@@ -31,6 +31,7 @@ defmodule Infrastructure.ConnectionHandler do
 
   def connect(_, %{sock: nil, host: host, port: port, opts: opts,
   timeout: timeout} = s) do
+    Logger.info fn -> "Connecting to #{host |> inspect}:#{port}" end
     case :gen_tcp.connect(host, port, [active: true] ++ opts, timeout) do
       {:ok, sock} ->
         {:ok, %{s | sock: sock}}
