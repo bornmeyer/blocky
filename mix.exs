@@ -5,7 +5,7 @@ defmodule BlockchainServer.MixProject do
     [
       apps_path: "apps",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
     ]
   end
 
@@ -15,6 +15,6 @@ defmodule BlockchainServer.MixProject do
   #
   # Run "mix help deps" for examples and options.
   defp deps do
-    []
+   []
   end
 end

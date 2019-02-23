@@ -4,12 +4,19 @@ defmodule Infrastructure.Application do
   @moduledoc false
 
   use Application
+  require Logger
 
   def start(_type, _args) do
+
     # List all child processes to be supervised
     children = [
       # Starts a worker by calling: Infrastructure.Worker.start_link(arg)
       # {Infrastructure.Worker, arg}
+      Infrastructure.RanchListener.child_spec(),
+      Infrastructure.KnownNodesContainer.child_spec([:ok]),
+      Infrastructure.ConnectionSupervisor,
+      Infrastructure.OutgoingConnectionSupervisor
+      #
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

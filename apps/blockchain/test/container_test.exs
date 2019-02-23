@@ -15,7 +15,7 @@ defmodule ContainerTest do
   test "that a genesis block is automatically created as root" do
     id = to_string(:rand.uniform)
     {:ok, pid} = Container.start_link(id, Blockchain.Application.get_registry_name())
-    {:ok, id, new_state} = Container.append(pid, @payload)
+    {:ok, _id, new_state} = Container.append(pid, @payload)
 
     assert length(new_state) == 1 && Enum.count(new_state, fn x -> x.type == "genesis" end) == 1
   end
@@ -23,8 +23,8 @@ defmodule ContainerTest do
   test "that you can append blocks" do
     id = to_string(:rand.uniform)
     {:ok, pid} = Container.start_link(id, Blockchain.Application.get_registry_name())
-    {:ok, id, new_state} = Container.append(pid, @payload)
-    {:ok, id, new_state} = Container.append(pid, @payload)
+    {:ok, _id, _new_state} = Container.append(pid, @payload)
+    {:ok, _id, new_state} = Container.append(pid, @payload)
 
     assert length(new_state) == 2 && hd(new_state).type == "block" && Enum.at(new_state, 1).type == "genesis"
   end
