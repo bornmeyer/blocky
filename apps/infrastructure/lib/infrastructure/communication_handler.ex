@@ -1,6 +1,5 @@
 defmodule Infrastructure.CommunicationHandler do
   use GenServer
-  alias Infrastructure.ConnectionInfo
   alias Infrastructure.Helpers
   alias Infrastructure.MessageProcessor
   alias Infrastructure.MessageSender
@@ -20,7 +19,7 @@ defmodule Infrastructure.CommunicationHandler do
   end
 
   def handle_info({:tcp, socket, data}, state = %{socket: socket, transport: transport}) do
-    response = Helpers.unpack(data)
+    Helpers.unpack(data)
     |> MessageProcessor.handle_message(socket, transport)
     |> MessageSender.send()
     #transport.send(socket, response)

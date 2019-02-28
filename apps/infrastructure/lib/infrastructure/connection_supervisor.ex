@@ -24,7 +24,7 @@ defmodule Infrastructure.ConnectionSupervisor do
     {:ok, pid}
   end
 
-  def create_connection(existing_socket) do
+  def create_connection(_existing_socket) do
 
   end
 end

@@ -24,7 +24,6 @@ defmodule Infrastructure.KnownNodesContainer do
   end
 
   def handle_call({:add_address, address}, _from, [kown_nodes: kown_nodes, connected_nodes: connected_nodes]) do
-
     Logger.info "address in kown_nodes: #{address in kown_nodes}"
     case address in kown_nodes do
       true ->
@@ -39,7 +38,7 @@ defmodule Infrastructure.KnownNodesContainer do
   end
 
   def handle_call({:for_address, address}, _from, [kown_nodes: kown_nodes, connected_nodes: _connected_nodes] = state) do
-    {:reply, Enum.filter(kown_nodes, fn x -> x != address end), state }
+    {:reply, Enum.filter(kown_nodes, fn x -> x.ip == address.ip && x.port != address.port end), state }
   end
 
   ## api

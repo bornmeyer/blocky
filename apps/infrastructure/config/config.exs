@@ -33,6 +33,8 @@ require Logger
 config :infrastructure,
   port: :rand.uniform(65000),
   outgoing_ip: {127, 0, 0, 1},
-  outgoing_port: 29349
+  outgoing_port: 29349,
+  connect_on_start: true
+
 
 

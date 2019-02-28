@@ -23,9 +23,9 @@ defmodule Infrastructure.RanchListener do
   end
 
   defp get_port() do
-    port = Application.get_env(:infrastructure, :port) || 5555 |> String.to_integer
-    Logger.info port
-    port
+    #Ranch.procs()
+    #:ranch.procs(__MODULE__, :connections) |> Logger.warn
+    Application.get_env(:infrastructure, :port) || 5555 |> String.to_integer
   end
 
 end

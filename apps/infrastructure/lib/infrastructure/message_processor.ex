@@ -1,11 +1,12 @@
 defmodule Infrastructure.MessageProcessor do
   alias Infrastructure.ConnectionInfo
-  alias Infrastructure.Helpers
+
+  require Logger
 
   defp create_connection_info(socket, listening_port) do
-    with {:ok, {ip, port}} <- :inet.peername(socket),
+    with {:ok, {ip, _port}} <- :inet.peername(socket),
       {:ok, handler} <- Infrastructure.ConnectionSupervisor.create_connection(ip, listening_port) do
-        %ConnectionInfo{ip: ip, port: port, sender: handler}
+        %ConnectionInfo{ip: ip, port: listening_port, sender: handler}
     end
   end
 
@@ -25,6 +26,6 @@ defmodule Infrastructure.MessageProcessor do
   end
 
   def handle_message({:connected, nodes_to_connect_to}, _socket, _transport) do
-    IO.inspect nodes_to_connect_to
+    Logger.info "#{length(nodes_to_connect_to)}\n lalalala"
   end
 end

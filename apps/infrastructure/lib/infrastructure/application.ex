@@ -8,14 +8,15 @@ defmodule Infrastructure.Application do
 
   def start(_type, _args) do
 
-    children = create_children_specs(Application.get_env(:infrastructure, :disable_initial_connect))
+    Logger.warn Application.get_env(:infrastructure, :connect_on_start)
+    children = create_children_specs(Application.get_env(:infrastructure, :connect_on_start))
     IO.inspect children
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Infrastructure.Supervisor]
     result = Supervisor.start_link(children, opts)
 
-    unless Application.get_env(:infrastructure, :disable_initial_connect) do
+    if Application.get_env(:infrastructure, :connect_on_start) do
       pid = Infrastructure.OutgoingConnectionSupervisor.get_outgoing_connection()
       Infrastructure.MessageSender.connect(pid)
     end
@@ -32,8 +33,8 @@ defmodule Infrastructure.Application do
       #
     ]
     case initial_connect_disabled do
-      true -> children
-      false -> [Infrastructure.OutgoingConnectionSupervisor | children]
+      false -> children
+      true -> [Infrastructure.OutgoingConnectionSupervisor | children]
     end
   end
 end

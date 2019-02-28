@@ -11,7 +11,6 @@ defmodule Infrastructure.OutgoingConnectionSupervisor do
   def init(_) do
     ip = Application.get_env(:infrastructure, :outgoing_ip)
     port = Application.get_env(:infrastructure, :outgoing_port)
-    Logger.info fn -> "#{ip |> inspect}:#{port} for outgoing" end
     children =  [
       Infrastructure.ConnectionHandler.child_spec([ip, port])
     ]
