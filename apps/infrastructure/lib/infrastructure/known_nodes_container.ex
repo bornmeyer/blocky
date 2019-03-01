@@ -53,6 +53,24 @@ defmodule Infrastructure.KnownNodesContainer do
     GenServer.call(__MODULE__, {:add_address, address})
   end
 
+  def add_addresses(addresses) do
+    known_addresses = list() |> Enum.map(fn x -> x.hash end)
+    Logger.info "known addresses:\n"
+    Logger.info addresses |> IO.inspect
+    diff = addresses |> Enum.filter(fn x -> x.hash in known_addresses end)
+    length(diff) |> Logger.info
+    append_to_state(diff)
+  end
+
+  defp append_to_state([h|t], counter \\ 0) do
+    add_address(h)
+    append_to_state(t, counter + 1)
+  end
+
+  defp append_to_state([], counter) do
+    Logger.info fn -> "address-books merged (#{counter} entries)" end
+  end
+
   def get_for(address) do
     GenServer.call(__MODULE__, {:for_address, address})
   end

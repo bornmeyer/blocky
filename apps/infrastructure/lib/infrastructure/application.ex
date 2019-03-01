@@ -17,7 +17,9 @@ defmodule Infrastructure.Application do
     result = Supervisor.start_link(children, opts)
 
     if Application.get_env(:infrastructure, :connect_on_start) do
-      pid = Infrastructure.OutgoingConnectionSupervisor.get_outgoing_connection()
+      ip = Application.get_env(:infrastructure, :outgoing_ip)
+      port = Application.get_env(:infrastructure, :outgoing_port)
+      {:ok, pid} = Infrastructure.OutgoingConnectionSupervisor.get_outgoing_connection(ip, port)
       Infrastructure.MessageSender.connect(pid)
     end
     result
