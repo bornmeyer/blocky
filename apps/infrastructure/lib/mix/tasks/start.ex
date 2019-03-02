@@ -21,7 +21,6 @@ defmodule Mix.Tasks.Infrastructure.Start do
   end
 
   defp process(opts) do
-    opts |> IO.inspect
     ip = opts[:ip_out] || "127.0.0.1"
     outgoing_port = opts[:port_out] || 9000
     port = opts[:port] || 9001
@@ -40,7 +39,6 @@ defmodule Mix.Tasks.Infrastructure.Start do
                                                  port_out: :integer,
                                                  port:   :integer,
                                                  connect_on_start: :boolean ])
-    parse |> inspect |> Logger.warn
     case parse do
       { options       , _, _ } -> options
     end

@@ -1,5 +1,7 @@
 defmodule Infrastructure.MessageProcessor do
   alias Infrastructure.ConnectionInfo
+  alias Infrastructure.ConnectionHandler
+  alias Infrastructure.MessageSender
 
   require Logger
 
@@ -7,6 +9,12 @@ defmodule Infrastructure.MessageProcessor do
     with {:ok, {ip, _port}} <- :inet.peername(socket),
       {:ok, handler} <- Infrastructure.ConnectionSupervisor.create_connection(ip, listening_port) do
         %ConnectionInfo{ip: ip, port: listening_port, sender: handler, hash: create_hash(ip, listening_port)}
+    end
+  end
+
+  defp create_connection_info([ip: ip, port: listening_port]) do
+    with {:ok, handler} <- Infrastructure.ConnectionSupervisor.create_connection(ip, listening_port) do
+      %ConnectionInfo{ip: ip, port: listening_port, sender: handler, hash: create_hash(ip, listening_port)}
     end
   end
 
@@ -20,7 +28,6 @@ defmodule Infrastructure.MessageProcessor do
 
   defp create_hash(ip, port, hash_algorithm \\ :sha512) when is_tuple(ip) and is_integer(port) do
     data = "#{convert_ip(ip)}::#{to_string(port)}"
-
     :crypto.hash(hash_algorithm, data) |> Base.encode16
   end
 
@@ -39,7 +46,20 @@ defmodule Infrastructure.MessageProcessor do
     {:connected, list, connection_info}
   end
 
-  def handle_message({:connected, nodes_to_connect_to}, _socket, _transport) do
-    Infrastructure.KnownNodesContainer.add_addresses(nodes_to_connect_to)
+  def handle_message({:connected, nodes_to_connect_to}, _socket, _transport) when is_list(nodes_to_connect_to) do
+    #Infrastructure.KnownNodesContainer.add_addresses(nodes_to_connect_to)
+    connect_to_received_nodes(nodes_to_connect_to)
+  end
+
+  defp connect_to_received_nodes([h|t]) do
+    Logger.info "connecting to #{convert_ip(h.ip)}:#{h.port}"
+    connection_info = create_connection_info(ip: h.ip, port: h.port)
+    connection_info |> register_remote_address
+    MessageSender.connect(connection_info.sender)
+    connect_to_received_nodes(t)
+  end
+
+  defp connect_to_received_nodes([]) do
+
   end
 end

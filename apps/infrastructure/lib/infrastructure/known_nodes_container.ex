@@ -20,25 +20,28 @@ defmodule Infrastructure.KnownNodesContainer do
   ## callbacks
 
   def init(_init_arg) do
-    {:ok, [kown_nodes: [], connected_nodes: []]}
+    {:ok, [known_nodes: [], connected_nodes: []]}
   end
 
-  def handle_call({:add_address, address}, _from, [kown_nodes: kown_nodes, connected_nodes: connected_nodes]) do
-    Logger.info "address in kown_nodes: #{address in kown_nodes}"
-    case address in kown_nodes do
-      true ->
-        {:reply, {:allready_added, address}, [kown_nodes: kown_nodes, connected_nodes: connected_nodes]}
+  def handle_call({:add_address, address}, _from, [known_nodes: known_nodes, connected_nodes: connected_nodes]) do
+    Logger.info "address in known_nodes: #{address in known_nodes}"
+    case address in known_nodes do
       false ->
-        {:reply, {:ok, address}, [kown_nodes: [address | kown_nodes], connected_nodes: connected_nodes]}
+        Logger.info false
+        {:reply, {:ok, address}, [known_nodes: [address | known_nodes], connected_nodes: connected_nodes]}
+      true ->
+        Logger.info true
+        {:reply, {:allready_added, address}, [known_nodes: known_nodes, connected_nodes: connected_nodes]}
     end
   end
 
-  def handle_call(:list, _from, [kown_nodes: kown_nodes, connected_nodes: _connected_nodes] = state) do
-    {:reply, kown_nodes, state}
+  def handle_call(:list, _from, [known_nodes: known_nodes, connected_nodes: _connected_nodes] = state) do
+    {:reply, known_nodes, state}
   end
 
-  def handle_call({:for_address, address}, _from, [kown_nodes: kown_nodes, connected_nodes: _connected_nodes] = state) do
-    {:reply, Enum.filter(kown_nodes, fn x -> x.ip == address.ip && x.port != address.port end), state }
+  def handle_call({:for_address, address}, _from, [known_nodes: known_nodes, connected_nodes: _connected_nodes] = state) do
+    result = known_nodes |> Enum.filter(fn x -> x.hash != address.hash end)
+    {:reply, result, state }
   end
 
   ## api
@@ -55,14 +58,11 @@ defmodule Infrastructure.KnownNodesContainer do
 
   def add_addresses(addresses) do
     known_addresses = list() |> Enum.map(fn x -> x.hash end)
-    Logger.info "known addresses:\n"
-    Logger.info addresses |> IO.inspect
-    diff = addresses |> Enum.filter(fn x -> x.hash in known_addresses end)
-    length(diff) |> Logger.info
-    append_to_state(diff)
+    diff = addresses |> Enum.filter(fn x -> x.hash not in known_addresses end)
+    append_to_state(diff, 0)
   end
 
-  defp append_to_state([h|t], counter \\ 0) do
+  defp append_to_state([h|t], counter) do
     add_address(h)
     append_to_state(t, counter + 1)
   end

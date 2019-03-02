@@ -7,7 +7,6 @@ defmodule Infrastructure.MessageSender do
   end
 
   def send({response_code, list, connection_info} = payload) do
-    IO.inspect payload
     ConnectionHandler.send(connection_info.sender, {response_code, list} |> Helpers.pack())
   end
 

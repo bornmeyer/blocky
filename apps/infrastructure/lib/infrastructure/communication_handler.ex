@@ -19,10 +19,10 @@ defmodule Infrastructure.CommunicationHandler do
   end
 
   def handle_info({:tcp, socket, data}, state = %{socket: socket, transport: transport}) do
+    Logger.info  Helpers.unpack(data) |> inspect
     Helpers.unpack(data)
     |> MessageProcessor.handle_message(socket, transport)
     |> MessageSender.send()
-    #transport.send(socket, response)
     {:noreply, state}
   end
 
