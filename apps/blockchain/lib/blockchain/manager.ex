@@ -39,7 +39,7 @@ defmodule Blockchain.Manager do
   def on_validated(:ok) do
   end
 
-  def on_validated({:error, state} = result) do
+  def on_validated({:error, _state} = result) do
     result |> inspect |> Logger.info
   end
 

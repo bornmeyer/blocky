@@ -6,7 +6,7 @@ defmodule Infrastructure.MessageSender do
     ConnectionHandler.send(socket, {:connect, Application.get_env(:infrastructure, :port)} |> Helpers.pack())
   end
 
-  def send({response_code, list, connection_info} = payload) do
+  def send({response_code, list, connection_info} = _payload) do
     ConnectionHandler.send(connection_info.sender, {response_code, list} |> Helpers.pack())
   end
 
